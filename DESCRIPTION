@@ -1,0 +1,20 @@
+Package: SRGnet
+Title: SRGnet An R package for studying synergistic response genes
+        from transcriptomics data
+Version: 0.99.2
+Authors@R: c(person("Isar", "Nassiri", email = "isar_nassiri@urmc.rochester.edu", role = c("aut", "cre")), person("Matthew", "McCall", email = "Matthew_Mccall@URMC.Rochester.edu", role = c("aut", "cre")))
+Description: We developed SRMnet to analyze synergistic regulatory mechanisms in transcriptome profiles that act to enhance the overall cell response to combination of mutations, drugs or environmental exposure. This package can be used to identify regulatory modules downstream of synergistic response genes, prioritize synergistic regulatory genes that may be potential intervention targets, and contextualize gene perturbation experiments.
+Depends: R (>= 3.2.2), EBcoexpress, MASS, igraph, pvclust (>= 2.0-0),
+        RedeR, bnlearn (>= 3.2.5), gRain (>= 1.2-5), ggplot2 (>=
+        2.1.0), gbm (>= 2.1.1), limma, DMwR (>= 0.4.1), matrixStats
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 5.0.1.9000
+biocViews: Software, StatisticalMethod, Regression
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+NeedsCompilation: no
+Packaged: 2016-06-02 15:29:15 UTC; inassiri1
+Author: Isar Nassiri [aut, cre], Matthew McCall [aut, cre]
+Maintainer: Isar Nassiri <isar_nassiri@urmc.rochester.edu> 
