@@ -1,0 +1,39 @@
+---
+title: "NetCRG: An R package for studying cooperative response genes from transcriptomics data"
+author: "Isar Nassiri, Matthew McCall"
+date: "May 24, 2016"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{NetCRG: An R package for studying cooperative response genes from transcriptomics data}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+# 1. Introduction
+
+We developed an R/Bioconductor package, CRMnet, to analyze regulatory mechanisms in transcriptome profiles by identifying cooperation response modules that act as key regulators of tumor formation. This package can be used to construct synergistic regulatory modules downstream of cooperation response genes, prioritize synergistic regulatory modules to identify potential intervention targets, and contextualize gene perturbation experiments. We demonstrate the use of CRMnet to analyze transcriptomics profiles from a murine colon cancer model. 
+
+# 2. Importing the data
+
+We first load the package.
+
+library(NetCRG)
+
+For importing data to the NetCRG we have two option: 
+1. Using predefined list of differentially expressed genes (DEGs) and cooperation response genes (CRGs), 
+2. Extraction of differentially expressed genes and list of cooperation response genes de novo.
+
+**Option 1:** importing the list of known differentially expressed genes and cooperation response genes. We can perform this task by using the function of **"load_data()"**
+
+**Option 2:** importing the transcription profile and extract list of differentially expressed genes and CRGs. We can perform this task by using the **"CRGs_extraction()"** functions.
+
+# 3. Network of cooperation response genes inference
+
+For construction of gene regulatory network of CRGs, we use the **CRGs_extraction_inf()** or **PL()** functions. This includes three-step procedure including: 
+(i) reduce the search space to the most probable associated DEGs with CRG based on non-rejection rate approach 
+(ii) Prune the set of associated DEGs with CRG until converge to a gene set with best fit to the synergistic expression pattern in transcriptomics profiles by using the discriminant analysis 
+(iii) Visualization of network topology.
+
+The **CRGs_extraction_inf()** can be applied if user just has transcritomic profile file as input.
+The **PL()** can be applied if user has transcritomic profile and list of cooperation response genes as inputs. 
+ 
