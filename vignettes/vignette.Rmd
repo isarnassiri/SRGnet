@@ -1,17 +1,17 @@
 ---
-title: "SRMnet: An R package for studying synergistic response genes based on transcriptomics data"
+title: "SRGnet: An R package for studying synergistic response genes based on transcriptomics data"
 author: "Isar Nassiri, Matthew McCall"
 date: "May 24, 2016"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{SRMnet: An R package for studying synergistic response genes from transcriptomics data}
+  %\VignetteIndexEntry{SRGnet: An R package for studying synergistic response genes from transcriptomics data}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 
 ## 1. Introduction
 
-We developed an R/Bioconductor package, SRMnet, to analyze synergistic regulatory mechanisms in transcriptome profiles that act to enhance the overall cell response to combination of mutations, drugs or environmental exposure. This package can be used to identify regulatory modules downstream of synergistic response genes, prioritize synergistic regulatory genes that may be potential intervention targets, and contextualize gene perturbation experiments.
+We developed an R/Bioconductor package, SRGnet, to analyze synergistic regulatory mechanisms in transcriptome profiles that act to enhance the overall cell response to combination of mutations, drugs or environmental exposure. This package can be used to identify regulatory modules downstream of synergistic response genes, prioritize synergistic regulatory genes that may be potential intervention targets, and contextualize gene perturbation experiments.
 
 ## 2. Input data
 
