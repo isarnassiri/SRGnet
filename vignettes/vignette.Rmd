@@ -1,0 +1,34 @@
+---
+title: "SRGnet: An R package for studying synergistic response genes based on transcriptomics data"
+author: "Isar Nassiri, Matthew McCall"
+date: "May 24, 2016"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{SRGnet: An R package for studying synergistic response genes from transcriptomics data}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+## 1. Introduction
+
+We developed an R/Bioconductor package, SRGnet, to analyze synergistic regulatory mechanisms in transcriptome profiles that act to enhance the overall cell response to combination of mutations, drugs or environmental exposure. This package can be used to identify regulatory modules downstream of synergistic response genes, prioritize synergistic regulatory genes that may be potential intervention targets, and contextualize gene perturbation experiments.
+
+## 2. Input data
+
+For definition of inputs, we have two option: 
+
+1. Using the transcriptomics profile, list of differentially expressed genes (DEGs), and synergistic response genes (SRGs) to infer the SRMs network. The package reads the example files from folder of data in home directory. New inputs should be prepared in the same structure and title with example files, and imported to the workspace before call the SRGnet functins.
+
+2. Using the **"SRG"** function for identification of differentially expressed genes and SRGs based on transcriptomics profile.  **"SRG"** function uses the example of transcriptomic profile as input in RDA format from folder of data in home directory. New input should be prepared in the same structure and title with example transcriptomic profile in home directory of package (data folder), and imported to the workspace before call the SRG functin.
+
+## 3. Inference of integrated network of SRGs
+
+**Option 1:** The **"SRGnet"** function can be used if user has transcriptomic profile, list of differentially expressed genes, and list of synergistic response genes as inputs. The function can be ran in two mode of Slow or Fast. In fast mode, step of expectation maximization for estimation of hyperparameters is omitted. User can run the **"SRGnet"** function in fast or slow mode by using the "F" or "S" as input, respectively [_e.g._ SRGnet("F")]. 
+
+**Option 2:** In the cases that user just has transcriptomic profile as input, first, **"SRG"** should be applied to extract list of differentially expressed genes and SRGs. 
+
+## 4. Outputs
+
+The outputs of **"SRGnet"** include the topology of SRMs network and ranked list of genes in network based on differential connectivity score, which can be found in home directory of package as text files.
+
+The outputs of **"SRG"** function include the list of synergistic response genes and differentially expressed genes, which can be found in home directory of package as text files.
