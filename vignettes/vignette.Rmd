@@ -2,10 +2,10 @@
 title: "SRGnet: An R package for studying synergistic response genes based on transcriptomics data"
 author: "Isar Nassiri, Matthew McCall"
 date: "May 24, 2016"
-output: rmarkdown::html_vignette
+ 
 vignette: >
   %\VignetteIndexEntry{SRGnet: An R package for studying synergistic response genes from transcriptomics data}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{rmarkdown::render()}
   \usepackage[utf8]{inputenc}
 ---
 
