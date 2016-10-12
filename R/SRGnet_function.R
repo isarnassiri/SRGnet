@@ -16,6 +16,7 @@
 #'@title{Identification of differentially expressed and synergistic response genes (SRGs) in transcriptomics profile}
 #'@description{We use the "SRG" function for identification of synergy or interaction effects between genes in transcriptomics profile in response to combination of mutations, drugs or environmental exposure. SRG returns lists of synergistic response genes and differentially expressed genes, which can be found in home directory of package as text file under title of "List_SRGs" and "List_DEGs", respectively.}
 #'@author{Matthew McCall, Isar Nassiri}
+#'@usage{SRG(threshold of pvalue = 0.01)}
 #'@examples{
 #'data(Transcriptomics)
 #'SRG(0.01)}
@@ -125,6 +126,7 @@ SRG <- function(pvalue) {
 #'@title{Gene regulatory network inference based on predifined list of differentially expressed genes, list of synergistic response genes and transcriptomics profile}
 #'@description{The "SRGnet" can be applied if user has transcriptomic profile, list of differentially expressed genes and synergistic response genes as inputs. The function can be ran in two mode of Slow or Fast. In fast mode, step of expectation maximization for estimation of hyperparameters is omitted. User can run the function in fast or slow mode by using the "F" or "S" as input of "PL()" function, respectively [e.g. SRGs_identification(“F”)]. SRGs_identification returns the topology of SRMs network and ranked list of genes in network based on differential connectivity score, which can be found in home directory of package under title of "DC_score" and "Topology_of_integrated_network" as text files.}
 #'@author{Isar Nassiri, Matthew McCall}
+#'@usage{SRGnet(run mode = "F")}
 #'@examples{
 #'data(Differentially_expressed_genes)
 #'data(Transcriptomics)
