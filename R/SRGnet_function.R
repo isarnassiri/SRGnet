@@ -14,18 +14,11 @@
 #'
 #'@name{SRG}
 #'@title{Identification of differentially expressed and synergistic response genes (SRGs) in transcriptomics profile}
-#'@usage{
-#'SRG(threshold of pvalue = 0.01)
-#'}
-#'@description{
-#'We use the "SRG" function for identification of synergy or interaction effects between genes in transcriptomics profile in response to combination of mutations, drugs or environmental exposure. SRG returns lists of synergistic response genes and differentially expressed genes, which can be found in home directory of package as text file under title of "List_SRGs" and "List_DEGs", respectively.
-#'}
+#'@description{We use the "SRG" function for identification of synergy or interaction effects between genes in transcriptomics profile in response to combination of mutations, drugs or environmental exposure. SRG returns lists of synergistic response genes and differentially expressed genes, which can be found in home directory of package as text file under title of "List_SRGs" and "List_DEGs", respectively.}
 #'@author{Matthew McCall, Isar Nassiri}
 #'@examples{
-#'#using transcriptomic profiles from a murine colon cancer model
 #'data(Transcriptomics)
-#'SRG(0.01)
-#'}
+#'SRG(0.01)}
 
 SRG <- NULL
 SRG <- function(pvalue) {
@@ -130,15 +123,9 @@ SRG <- function(pvalue) {
 
 #'@name{SRGnet}
 #'@title{Gene regulatory network inference based on predifined list of differentially expressed genes, list of synergistic response genes and transcriptomics profile}
-#'@usage{
-#'SRGnet(run mode = "F")
-#'}
-#'@description{
-#'The "SRGnet" can be applied if user has transcriptomic profile, list of differentially expressed genes and synergistic response genes as inputs. The function can be ran in two mode of Slow or Fast. In fast mode, step of expectation maximization for estimation of hyperparameters is omitted. User can run the function in fast or slow mode by using the "F" or "S" as input of "PL()" function, respectively [e.g. SRGs_identification(“F”)]. SRGs_identification returns the topology of SRMs network and ranked list of genes in network based on differential connectivity score, which can be found in home directory of package under title of "DC_score" and "Topology_of_integrated_network" as text files.
-#'}
+#'@description{The "SRGnet" can be applied if user has transcriptomic profile, list of differentially expressed genes and synergistic response genes as inputs. The function can be ran in two mode of Slow or Fast. In fast mode, step of expectation maximization for estimation of hyperparameters is omitted. User can run the function in fast or slow mode by using the "F" or "S" as input of "PL()" function, respectively [e.g. SRGs_identification(“F”)]. SRGs_identification returns the topology of SRMs network and ranked list of genes in network based on differential connectivity score, which can be found in home directory of package under title of "DC_score" and "Topology_of_integrated_network" as text files.}
 #'@author{Isar Nassiri, Matthew McCall}
 #'@examples{
-#'#using transcriptomic profiles, list of differentially expressed genes, and list of synergistic response genes from a murine colon cancer model.
 #'data(Differentially_expressed_genes)
 #'data(Transcriptomics)
 #'data(PLCRG)
@@ -553,11 +540,11 @@ SRGnet <- function(type_of_run) #SRGnet("F"): fast run; SRGnet("S"): slow run
     relations2, Destiny_Folder, sep = "\t", row.names = F, quote = FALSE
   )
   
-  #---
-  rdp <- RedPort ()
-  calld(rdp)
-  addGraph(rdp, g, layout.kamada.kawai(g))
-  relax(rdp,p2 = 400,p5 = 30,ps = TRUE)
+  #--- Visulization of network ---
+  #rdp <- RedPort()
+  #calld(rdp)
+  #addGraph(rdp, g, layout.kamada.kawai(g))
+  #relax(rdp,p2 = 400,p5 = 30,ps = TRUE)
   
   #--- ranking SRGs ---
   
