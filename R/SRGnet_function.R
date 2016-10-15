@@ -5,7 +5,6 @@
 #' @import pvclust
 #' @import RedeR
 #' @import gRain
-#' @import ggplot2
 #' @import gbm
 #' @import limma
 #' @import DMwR
