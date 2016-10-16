@@ -125,6 +125,7 @@ SRG <- function(pvalue) {
 #'@author{Isar Nassiri, Matthew McCall}
 #'@param type_of_run A character.
 #'@examples{
+#'setInternet2(TRUE)
 #'data(Differentially_expressed_genes)
 #'data(Transcriptomics)
 #'data(PLCRG)
@@ -539,10 +540,10 @@ SRGnet <- function(type_of_run) #SRGnet("F"): fast run; SRGnet("S"): slow run
   )
   
   #--- Visulization of network ---
-  rdp <- RedPort()
-  calld(rdp)
-  addGraph(rdp, g, layout.kamada.kawai(g))
-  relax(rdp,p2 = 400,p5 = 30,ps = TRUE)
+  #rdp <- RedPort()
+  #calld(rdp)
+  #addGraph(rdp, g, layout.kamada.kawai(g))
+  #relax(rdp,p2 = 400,p5 = 30,ps = TRUE)
   
   #--- ranking SRGs ---
   
