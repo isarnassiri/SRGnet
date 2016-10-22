@@ -126,11 +126,10 @@ SRG <- function(pvalue) {
 #'@param type_of_run A character, "F": Fast or "S": Slow.
 #'@param visualization A character, visualize of the SRGs network, "TRUE": Yes, or "FALSE": No.
 #'@examples{
-#'setInternet2(TRUE)
 #'data(Differentially_expressed_genes)
 #'data(Transcriptomics)
 #'data(PLCRG)
-#'SRGnet("F","FALSE") #fast run and donot visualize the SRGs network
+#'SRGnet("F","FALSE") #Fast run and do not visualize the SRGs network
 #'}
 #'@export
 
