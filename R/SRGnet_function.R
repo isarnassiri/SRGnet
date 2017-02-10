@@ -1,6 +1,5 @@
 #' @export
-#' @importFrom igraph as_graphnel
-#' @importFrom igraph graph.data.frame
+#' @import igraph
 #' @import MASS
 #' @import pvclust
 #' @import RedeR
@@ -10,131 +9,22 @@
 #' @import DMwR
 #' @import EBcoexpress
 #' @import matrixStats
+#' @import Hmisc
 #'
-#'@title{Identification of differentially expressed and synergistic response genes (SRGs) in transcriptomics profile}
-#'@description{We use the "SRG" function for identification of synergy or interaction effects between genes in transcriptomics profile in response to combination of mutations, drugs or environmental exposure. SRG returns lists of synergistic response genes and differentially expressed genes, which can be found in home directory of package as text file under title of "List_SRGs" and "List_DEGs", respectively.}
-#'@author{Matthew McCall, Isar Nassiri}
-#'@param pvalue A number.
-#'@examples{
-#'data(Transcriptomics)
-#'SRG(0.01)}
-
-SRG <- NULL
-SRG <- function(pvalue) {
-
-  e2 <- as.matrix(Transcriptomics)
-
-  gnames <- e2[,1]
-  samplename <- as.character(e2[1,])
-  samplename <- samplename[-1]
-  e2 <- e2[-1,-1]
-
-  e2 <- apply(e2, c(1, 2), as.numeric)
-
-  n1 <- length(which(samplename == "c"))
-  n2 <- length(which(samplename == "q1"))
-  n3 <- length(which(samplename == "q2"))
-  n4 <- length(which(samplename == "q3"))
-
-  iP53 <- as.numeric(rep(c(0,1,0,1),c(n1,n2,n3,n4)))
-  iRas <- as.numeric(rep(c(0,1,1,0),c(n1,n2,n3,n4)))
-
-  #model.matrix creat the design matix as input of lmFit
-  design <- model.matrix( ~ iP53 * iRas)
-  colnames(design) <- c("none","dRas","dP53","dBoth")
-
-  #lmFit use to identify which genes are differentially expressed between the double mutant samples and YAMC
-  fit <- lmFit(e2, design)
-  fit <- eBayes(fit)
-  res <- topTable(fit, coef = 4, number = nrow(e2))
-
-  ## which genes have significant interaction term
-  dP53 <- NULL
-  dRas <- NULL
-  dBoth <- NULL
-  contrast.matrix <-
-    makeContrasts(dP53 + dRas + dBoth, levels = design)
-  fit2 <- contrasts.fit(fit, contrast.matrix)
-  fit2 <- eBayes(fit2)
-  res2 <- topTable(fit2, coef = 1, number = nrow(e2))
-
-  ## which genes are both differentially expressed and show an interaction
-  ## could alter the p-value threshold to be more or less restrictive
-  iInteraction <-
-    as.numeric(rownames(res)[res$adj.P.Val < pvalue])
-  iDiffExprs <-
-    as.numeric(rownames(res2)[res2$adj.P.Val < pvalue])
-  ind <- intersect(iInteraction, iDiffExprs)
-  newSRGs <- unique(sort(gnames[ind]))
-
-  selected <- NULL
-  selected <- data.frame()
-  n <- NULL
-
-  for (n in 1:length(newSRGs))
-  {
-    selected[n,1] <- n;
-    selected[n,2] <- newSRGs[n];
-  }
-
-  colnames(selected) <- c("Row","geneSymbol")
-  s <- n #number of SRGs
-
-  DEG <- NULL
-  DEG <- data.frame()
-
-  newDEGs <- unique(sort(gnames[iInteraction]))
-
-  for (n in 1:length(iDiffExprs))
-  {
-    DEG[n,1] <- newDEGs[n];
-
-    DEG[n,2] <-
-      log10(mean(as.numeric(e2[iDiffExprs[n],which(samplename == "q3")] / e2[iDiffExprs[n],which(samplename == "c")])))
-
-    DEG[n,3] <-
-      log10(mean(as.numeric(e2[iDiffExprs[n],which(samplename == "q2")] / e2[iDiffExprs[n],which(samplename == "c")])))
-
-    DEG[n,4] <-
-      log10(mean(as.numeric(e2[iDiffExprs[n],which(samplename == "q1")] / e2[iDiffExprs[n],which(samplename == "c")])))
-  }
-
-  colnames(DEG) <- c("Gene_names","a","b","a+b")   #in example files: "Gene_names","mp53","Ras","mp53/Ras"
-  DEG <- DEG[!duplicated(DEG$Gene_names),]
-  DEG <- DEG[!is.na(DEG$Gene_names),]
-  rownames(DEG) <- DEG$Gene_names
-
-  #-- save the results --
-  Destiny_Folder = system.file(package = "SRGnet")
-  Destiny_Folder = paste(Destiny_Folder, "/PLCRG.txt", sep = "")       #List of SRGs
-
-  write.table(
-    selected, Destiny_Folder, row.names = FALSE, quote = FALSE, sep = "\t", col.names = TRUE
-  )
-
-  Destiny_Folder = system.file(package = "SRGnet")
-  Destiny_Folder = paste(Destiny_Folder, "/Differentially_expressed_genes.txt", sep = "")      #List of DEGs
-
-  write.table(
-    DEG,Destiny_Folder, row.names = FALSE, quote = FALSE, sep = "\t"
-  )
-}
-
-#'@title{Gene regulatory network inference based on predifined list of differentially expressed genes, list of synergistic response genes and transcriptomics profile}
+#'@title{Synergistic response to gene mutations specific network}
 #'@description{The "SRGnet" can be applied if user has transcriptomic profile, list of differentially expressed genes and synergistic response genes as inputs. The function can be ran in two mode of Slow or Fast. In fast mode, step of expectation maximization for estimation of hyperparameters is omitted. User can run the function in fast or slow mode by using the "F" or "S" as input of "PL()" function, respectively [e.g. SRGs_identification(“F”)]. SRGs_identification returns the topology of SRMs network and ranked list of genes in network based on differential connectivity score, which can be found in home directory of package under title of "DC_score" and "Topology_of_integrated_network" as text files.}
 #'@author{Isar Nassiri, Matthew McCall}
 #'@param type_of_run A character, "F": Fast or "S": Slow.
-#'@param visualization A character, visualize of the SRGs network, "TRUE": Yes, or "FALSE": No.
 #'@examples{
 #'data(Differentially_expressed_genes)
 #'data(Transcriptomics)
 #'data(PLCRG)
-#'SRGnet("F","FALSE") #Fast run and do not visualize the SRGs network
+#'SRGnet("F") #Fast run  
 #'}
 #'@export
 
 SRGnet <- NULL
-SRGnet <- function(type_of_run, visualization) 
+SRGnet <- function(type_of_run) 
 {
   #Load data
   
@@ -142,7 +32,7 @@ SRGnet <- function(type_of_run, visualization)
   
   colnames <- as.matrix(DEGt[1,])
   DEGt <- DEGt[-1,]
-    
+  
   DEG <- data.frame()
   
   for (num_row in 1:dim(DEGt)[1])
@@ -161,27 +51,18 @@ SRGnet <- function(type_of_run, visualization)
   rownames(DEG) <- DEG[,1]
   #-----
   #Load data
- 
-  reading_expresson_profile <- as.matrix(Transcriptomics)
+   
+  e <- as.matrix(Transcriptomics)
   
-  samplename <- as.character(reading_expresson_profile[1,])
-  
-  colnames(reading_expresson_profile) <- samplename
-  
-  reading_expresson_profile <- reading_expresson_profile[-1,]
-  
-  samplename <- samplename[-1]
-  
-  e <- reading_expresson_profile
-  
-  DEG_Gene_names <- c(match(DEG[,1],e[,1]))
+  samplename <- as.character(colnames(e))
+
+  DEG_Gene_names <- c(match(DEG[,1],rownames(e)))
   DEG_Gene_names <- DEG_Gene_names[!is.na(DEG_Gene_names)]
   
   e <- e[DEG_Gene_names,]
   
-  names <- as.matrix(e[,1])
+  names <- as.matrix(rownames(e))
   
-  e <- e[,-1]
   e <- apply(e, c(1, 2), as.numeric)
   e1 <- matrix(,nrow = dim(e)[1],ncol = dim(e)[2])
   e[is.na(e)] <- 0
@@ -198,10 +79,10 @@ SRGnet <- function(type_of_run, visualization)
   colnames(e1) <- samplename
   
   #-------------
- 
+  
   selected <- data.frame()
   CRM_CRG <- data.frame()
-    
+  
   list_CRGs <- (PLCRG)
   
   colnames(list_CRGs) <- as.matrix(list_CRGs[1,])
@@ -209,7 +90,7 @@ SRGnet <- function(type_of_run, visualization)
   
   inf <- 1;
   CC <- 1;
-   
+  
   for (inf in 1:length(list_CRGs[,1]))
   {
     a1 <- length(intersect(DEG[,1],list_CRGs$Gene_symbol[inf]))
@@ -227,59 +108,64 @@ SRGnet <- function(type_of_run, visualization)
   colnames(selected) <- c("Synergy_score","geneSymbol")
   s <- length(selected$geneSymbol)
   
-  #-- DC analysis --
-  n1 <- length(grep("c", samplename))
-  tinyCond <- as.numeric(rep(c(1,2),c(n1,length(samplename) - n1)))
-  tinyPat <- ebPatterns(c("1,1","1,2"))
+  #-- DC analysis --  
   
-  D <- makeMyD(e1, tinyCond, useBWMC = F, gpsep = "~")
+  samplename <- colnames(e1)
   
-  set.seed(3)
-  initHP <- initializeHP(D[,1], tinyCond)
+  n1 <- length(which(samplename == "c"))
+  n2 <- length(which(samplename == "q1"))
+  n3 <- length(which(samplename == "q2"))
+  n4 <- length(which(samplename == "q3"))
+  
+  tinyCond <- as.numeric(rep(c(1, 2, 3, 4), c(n1, n2, n3, n4)))
+  length(tinyCond)
+  
+  #-- pattern --
+  
+  p1 <- paste(c(1, 1, 1, 1), collapse=", ")  #m_c=m_both=m_ras=m_p53
+  p2 <- paste(c(1, 2, 0, 0), collapse=", ")
+  tinyPat <- ebPatterns(c(p1, p2))
+  
+  D2 <- makeMyD(e1, tinyCond, useBWMC = F, gpsep = "~")
+     
+  set.seed(123)
+  initHP <- initializeHP(D2[,1], tinyCond, seed = 123)
   
   if (type_of_run == "S")
   {
     fout <-
-      ebCoexpressOneStep(D, tinyCond, tinyPat, initHP, controlOptions = list())
+      ebCoexpressOneStep(D2, tinyCond, tinyPat, initHP, controlOptions = list(applyTransform = TRUE))
   } else {
     fout <-
-      ebCoexpressZeroStep(D, tinyCond, tinyPat, initHP, controlOptions = list())
+      ebCoexpressZeroStep(D2, tinyCond, tinyPat, initHP, controlOptions = list(applyTransform = TRUE))
   }
   
-  softThresh <- crit.fun(fout$POSTPROB[,1], 0.05)
+  #-- Selection of differential coexpressed pairs of genes based on the FDR
+  
   ppbDC <- 1 - fout$POSTPROB[,1]
-  kept_s2 <- ppbDC[ppbDC >= softThresh]
+  kept_h <- ppbDC[ppbDC >= 0.999]
+  length(names(kept_h))
   
   graph_e <- data.frame()
   
-  for (i in 1:length(names(kept_s2)))
+  for (i in 1:length(names(kept_h)))
   {
-    e_ <- unlist(strsplit(names(kept_s2)[i], "~"))
+    e_ <- unlist(strsplit(names(kept_h)[i], "~"))
     graph_e[i,1] <- e_[1]
     graph_e[i,2] <- e_[2]
   }
   
-  interactions_base_NRR2 <- as.matrix(graph_e)
-  colnames(interactions_base_NRR2) <- c("geneSymbol", "geneSymbol2")
-  
-  #-------------
-  Fcol <- c(interactions_base_NRR2[,1])
-  Scol <- c(interactions_base_NRR2[,2])
-  
-  Fcol <- type.convert(Fcol, numerals = c("allow.loss"))
-  Scol <- type.convert(Scol, numerals = c("allow.loss"))
-  
-  matrix_of_interactions <- NULL
-  matrix_of_interactions <- data.frame(names[Fcol,1],names[Scol,1])
+  matrix_of_interactions <- as.matrix(graph_e)
+  colnames(matrix_of_interactions) <- c("geneSymbol", "geneSymbol2")
+  print("Number of differential coexpressed pairs of genes: ")
+  print(dim(matrix_of_interactions))
   
   #-- LDA Analysis --
   
   SRG_Set <- data.frame(); i <- 1; n <- 1;
   
   for (n in 1:s)
-  #for each SRG
   {
-    #create three set
     
     num_row <- c(match(selected[n,2], rownames(DEG)));
     
@@ -321,6 +207,7 @@ SRGnet <- function(type_of_run, visualization)
   summary(DEG[,4])
   
   #Training of LDA model [MASS package]
+  
   lda.fit = lda(Set ~ FC_value,data = SRG_Set)
   plot(lda.fit, dimen = 1, type = "both") # fit from lda
   
@@ -337,8 +224,7 @@ SRGnet <- function(type_of_run, visualization)
   recordimprovement <- data.frame();
   rm <- 1
   
-  for (n in 1:s)
-    #for each SRG
+  for (n in 1:s)	  
   {
     p <- 1;
     
@@ -350,13 +236,11 @@ SRGnet <- function(type_of_run, visualization)
     
     actors[i,1] <- (name = selected[n,2]); i <- i + 1;
     
-    #List of genes that interact directly with indicated SGRs
-    
     l <- grep(selected[n,2],matrix_of_interactions[,1])
     L1 <- matrix_of_interactions[l,2]
     l <- grep(selected[n,2],matrix_of_interactions[,2])
     L2 <- matrix_of_interactions[l,1]
-    LIN <- length(L1) + length(L2)#number of interaction of s
+    LIN <- length(L1) + length(L2)	
     #--
     
     if (0 < length(L1))
@@ -406,8 +290,7 @@ SRGnet <- function(type_of_run, visualization)
     #-- Refinement step --
     
     if (length(prediction))
-    {
-      #use the FC values of related genes to the given SRG as test set
+    {		
       colnames(prediction) <- c("gene_symbol", "FC_value", "Set")
       lda.pred = predict(lda.fit,prediction)
       ct <-
@@ -420,8 +303,7 @@ SRGnet <- function(type_of_run, visualization)
       recordimprovement[rm,1] <- record_first;
       #--
       
-      #Some data structures before refinemene
-      record <- data.frame(); n1 <- -2; t <- 1;
+      record <- data.frame(); n0 <- -2; t <- 1;
       prediction_final <- data.frame();
       prediction_test <- data.frame();
       prediction_final <- prediction
@@ -431,18 +313,18 @@ SRGnet <- function(type_of_run, visualization)
       
       for (u in 1:boundary)
       {
-        n1 <- n1 + 3;
+        n0 <- n0 + 3;
         
-        prediction_test <- prediction_final[-(n1:(n1 + 2)),]
+        prediction_test <- prediction_final[-(n0:(n0 + 2)),]
         
         colnames(prediction_test) <-
           c("gene_symbol", "FC_value", "Set")
         
         lda.pred = predict(lda.fit,prediction_test)
         ct <-
-          table(lda.pred$class,prediction_test$Set)#table() returns a contingency table
+          table(lda.pred$class,prediction_test$Set)
         mean(lda.pred$class == prediction_test$Set)
-        diag(prop.table(ct, 1)) # percent correct for each category of G
+        diag(prop.table(ct, 1)) 
         
         record[t,1] <- sum(diag(prop.table(ct)));
         
@@ -453,22 +335,21 @@ SRGnet <- function(type_of_run, visualization)
         if (c)
         {
           prediction_final <- prediction_test;
-          n1 <- n1 - 3;
+          n0 <- n0 - 3;
           
         } else {
           actors[i,1] <-
-            as.character(prediction_final$gene_symbol[n1]);i <-
+            as.character(prediction_final$gene_symbol[n0]);i <-
               i + 1;
             
             relations[i2,1] <- selected[n,2];
             relations[i2,2] <-
-              prediction_final$gene_symbol[n1]; i2 <- i2 + 1;
+              prediction_final$gene_symbol[n0]; i2 <- i2 + 1;
               
         }
-        t <- t + 1; #total percent correct
+        t <- t + 1; #total % correct
       }
       
-      #Save the results of prediction
       recordimprovement[rm,2] <- max(record);
       rm <- rm + 1;
       
@@ -509,7 +390,6 @@ SRGnet <- function(type_of_run, visualization)
     }
   }
   
-  recordimprovement$V1
   op <- par(mfrow = c(1,1))
   boxplot(
     recordimprovement$V1 * 100,recordimprovement$V2 * 100, col = (c("light yellow","light green")),
@@ -517,110 +397,77 @@ SRGnet <- function(type_of_run, visualization)
       c("Before Refinement","After Refinement"),ylab = "Percentage"
   )
   
-  dim(recordimprovement)
-  ttest <- t.test(recordimprovement$V1,recordimprovement$V2)
-  qt(c(.025, .975), ttest$parameter)
-  
-  #igraph format
-  actors <- unique(actors)
-  actors <- actors[!is.na(actors)]
+
+  actors <- unique(c(relations[,1],relations[,2]))
   relations <- unique(relations)
   relations2 <- na.omit(relations)
   colnames(relations2) <- c("from","to")
-  g <-
-    graph.data.frame(relations2, directed = TRUE, vertices = actors) #igraph
   
-  #---
+  #igraph format [use for visulization]
+  #g1 <- graph.data.frame(All_CRGs_in_graph_edges, directed=TRUE, vertices=unique(c(All_CRGs_in_graph_edges[,1],All_CRGs_in_graph_edges[,2])))   #igraph, if you conver the g2 to the matrix it will be asymmetrical
+  
+  #-- Add the interactions between DEGs/DEGs (non-CRGs) 
+  
+  All_DEGs_in_graph <- setdiff(unique(relations2[,2]), selected[,2])  #column 2 includes the interacting DEGs with CRGs
+  length(All_DEGs_in_graph)
+  
+  for(i in 1:dim(matrix_of_interactions)[1])
+  {
+    a <- which(matrix_of_interactions[i,1] %in% All_DEGs_in_graph)
+    b <- which(matrix_of_interactions[i,2] %in% All_DEGs_in_graph)
+    
+    if(0<length(a) && 0<length(b))
+    {
+      relations2 <- rbind(relations2, matrix_of_interactions[i,])
+    }
+  }
+  
+  #-- Direction of interactions --
+  
+  cor <- rcorr(t(e1[,which(samplename == "q1")]), type="pearson")
+  R <- as.matrix(cor$r)  #it is same with D
+  
+  for(i in 1:dim(relations2)[1])
+  {
+    sign <- R[which(rownames(R) %in% relations2[i,1]), which(rownames(R) %in% relations2[i,2])]
+    relations2[i,3] <- ifelse(0<sign, "+", "-")
+  }
+  
+  relations2 <- unique(relations2)
+  relations2 <- na.omit(relations2)
+  dim(relations2)
+  colnames(relations2) <- c("Source_node", "Target_node", "Type_of_interactions")
+  
+  print("Number of molecules")
+  print(length(actors))
+  print("Number of interactions")
+  print(dim(relations2))
+  print("Type of interactions (+: activators, -: inhibitors): ")
+  print(table(relations2[,3]))
+  
+#--- Visulization of network ---
+
+# g2 <- graph.data.frame(relations2[,1:2], directed=TRUE, vertices=actors)   #igraph, if you conver the g2 to the matrix it will be asymmetrical 
+# 
+# if(visualization)
+# {
+#   rdp <- RedPort()
+#   calld(rdp)
+#   
+#   addGraph(rdp, g1, gcoord=c(10,25), gscale=20, isNest=TRUE, theme='tm1', zoom=30)
+#   addGraph(rdp, g2, gcoord=c(50,70), gscale=50, isNest=TRUE, theme='tm1', zoom=30)
+#   
+#   nestNodes(rdp, nodes=V(g1)$name, parent="N1", theme='tm2')
+#   mergeOutEdges(rdp)
+# }
+  
+  #--- Save the topology of network ---
   
   Destiny_Folder <- system.file(package = "SRGnet")
   Destiny_Folder = paste(Destiny_Folder, "/Topology_of_integrated_network.txt", sep = "")
   
   write.table(
     relations2, Destiny_Folder, sep = "\t", row.names = F, quote = FALSE
-  )
-  
-  #--- Visulization of network ---
-  if(visualization)
-  {
-	rdp <- RedPort()
-	calld(rdp)
-	addGraph(rdp, g, layout.kamada.kawai(g))
-	relax(rdp,p2 = 400,p5 = 30,ps = TRUE)
-  }
-  #--- ranking SRGs ---
-  
-  #Load data
-  
-  reading_expresson_profile <- as.matrix(Transcriptomics)
-  
-  samplename <- as.character(reading_expresson_profile[1,])
-  
-  colnames(reading_expresson_profile) <- samplename
-  
-  reading_expresson_profile <- reading_expresson_profile[-1,]
-  
-  samplename <- samplename[-1]
-  
-  e <- reading_expresson_profile
-  
-  DEG_Gene_names <- c(match(actors,e[,1]))
-  DEG_Gene_names <- DEG_Gene_names[!is.na(DEG_Gene_names)]
-  
-  e <- e[DEG_Gene_names,]
-
-  names <- as.matrix(e[,1])
-  
-  e <- e[,-1]
-  e <- apply(e, c(1, 2), as.numeric)
-  e1 <- matrix(,nrow = dim(e)[1],ncol = dim(e)[2])
-  e[is.na(e)] <- 0
-  
-  for (n in 1:dim(e)[1])
-  {
-    for (n1 in 1:dim(e)[2])
-    {
-      e1[n,n1] <- log10(e[n,n1])
-    }
-  }
-  
-  rownames(e1) <- names
-  colnames(e1) <- samplename
-  
-  #-------------
-  n1 <- length(grep("c", samplename))
-  
-  tinyCond <- as.numeric(rep(c(1,2),c(n1,length(samplename) - n1)))
-  tinyPat <- ebPatterns(c("1,1","1,2"))
-  
-  D <- makeMyD(e1, tinyCond, useBWMC = F, gpsep = "~")
-  
-  set.seed(3)
-  initHP <- initializeHP(D[,1], tinyCond)
-  
-  if (type_of_run == "S")
-  {
-    fout <-
-      ebCoexpressOneStep(D, tinyCond, tinyPat, initHP, controlOptions = list())
-  } else {
-    fout <-
-      ebCoexpressZeroStep(D, tinyCond, tinyPat, initHP, controlOptions = list())
-  }
-  
-  hubs <-
-    rankMyGenes(fout, thresh = 0.95, sep = "~")       #A threshold for determining whether a pair is DC.
-  print(
-    "Prioritization based on Differential Connectivity (DC) score: Name of gene, degree"
-  )
-  print(hubs)
-  
-  hubs <- data.frame(hubs)
-  colnames(hubs) <- c("Gene_name DC_score")
-  
-  Destiny_Folder <- system.file(package = "SRGnet")
-  Destiny_Folder = paste(Destiny_Folder, "/DC_score.txt", sep = "")
-  
-  write.table(
-    hubs, Destiny_Folder, sep = "\t", row.names = TRUE, quote = FALSE
   )
   
   print("You can find the results at: ")

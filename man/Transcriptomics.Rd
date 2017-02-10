@@ -4,7 +4,7 @@
 \name{Transcriptomics}
 \alias{Transcriptomics}
 \title{{Murine colon cancer transcriptomics profile under single and combined mutations of mp53 and Ras}}
-\format{An object of class \code{data.frame} with 483 rows and 41 columns.}
+\format{An object of class \code{matrix} with 475 rows and 40 columns.}
 \usage{
 Transcriptomics
 }
