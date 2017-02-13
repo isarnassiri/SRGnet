@@ -2,8 +2,6 @@
 #' @import igraph
 #' @import MASS
 #' @import pvclust
-#' @import RedeR
-#' @import gRain
 #' @import gbm
 #' @import limma
 #' @import DMwR
