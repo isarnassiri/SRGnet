@@ -442,23 +442,7 @@ SRGnet <- function(type_of_run)
   print(dim(relations2))
   print("Type of interactions (+: activators, -: inhibitors): ")
   print(table(relations2[,3]))
-  
-#--- Visulization of network ---
-
-# g2 <- graph.data.frame(relations2[,1:2], directed=TRUE, vertices=actors)   #igraph, if you conver the g2 to the matrix it will be asymmetrical 
-# 
-# if(visualization)
-# {
-#   rdp <- RedPort()
-#   calld(rdp)
-#   
-#   addGraph(rdp, g1, gcoord=c(10,25), gscale=20, isNest=TRUE, theme='tm1', zoom=30)
-#   addGraph(rdp, g2, gcoord=c(50,70), gscale=50, isNest=TRUE, theme='tm1', zoom=30)
-#   
-#   nestNodes(rdp, nodes=V(g1)$name, parent="N1", theme='tm2')
-#   mergeOutEdges(rdp)
-# }
-  
+ 
   #--- Save the topology of network ---
   
   Destiny_Folder <- system.file(package = "SRGnet")
