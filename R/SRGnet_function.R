@@ -10,7 +10,7 @@
 #' @import Hmisc
 #'
 #'@title{Synergistic response to gene mutations specific network}
-#'@description{The "SRGnet" can be applied if user has transcriptomic profile, list of differentially expressed genes and synergistic response genes as inputs. The function can be ran in two mode of Slow or Fast. In fast mode, step of expectation maximization for estimation of hyperparameters is omitted. User can run the function in fast or slow mode by using the "F" or "S" as input of "PL()" function, respectively [e.g. SRGs_identification(“F”)]. SRGs_identification returns the topology of SRMs network and ranked list of genes in network based on differential connectivity score, which can be found in home directory of package under title of "DC_score" and "Topology_of_integrated_network" as text files.}
+#'@description{The "SRGnet" can be applied if user has transcriptomic profile, list of differentially expressed genes and synergistic response genes as inputs. The function can be ran in two mode of Slow or Fast. In fast mode, step of expectation maximization for estimation of hyperparameters is omitted. User can run the function in fast or slow mode by using the "F" or "S" as input of "SRGnet()" function, respectively [e.g. SRGnet(“F”)]. SRGnet returns the topology of SRMs network and ranked list of genes in network based on differential connectivity score, which can be found in home directory of package under title of "DC_score" and "Topology_of_integrated_network" as text files.}
 #'@author{Isar Nassiri, Matthew McCall}
 #'@param type_of_run A character, "F": Fast or "S": Slow.
 #'@examples{
