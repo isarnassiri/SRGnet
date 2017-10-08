@@ -13,6 +13,5 @@ biocViews: Software, StatisticalMethod, Regression
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2016-06-02 15:29:15 UTC; inassiri1
 Author: Isar Nassiri [aut, cre], Matthew McCall [aut, cre]
-Maintainer: Isar Nassiri <isar_nassiri@urmc.rochester.edu> 
+Maintainer: Isar Nassiri <isar_nassiri@urmc.rochester.edu>
