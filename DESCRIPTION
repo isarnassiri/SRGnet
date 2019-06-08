@@ -1,6 +1,6 @@
 Package: SRGnet
 Title: SRGnet: An R package for studying synergistic response to gene mutations from transcriptomics data
-Version: 1.11.0
+Version: 1.12.0
 Authors@R: c(person("Isar", "Nassiri", email = "isar_nassiri@urmc.rochester.edu", role = c("aut", "cre")))
 Description: We developed SRGnet to analyze synergistic regulatory mechanisms in transcriptome profiles that act to enhance the overall cell response to combination of mutations, drugs or environmental exposure. This package can be used to identify regulatory modules downstream of synergistic response genes, prioritize synergistic regulatory genes that may be potential intervention targets, and contextualize gene perturbation experiments.
 Depends: R (>= 3.3.1), EBcoexpress, MASS, igraph, pvclust (>= 2.0-0), gbm (>= 2.1.1), limma, DMwR (>= 0.4.1), matrixStats, Hmisc
